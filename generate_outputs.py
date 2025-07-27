@@ -50,8 +50,11 @@ print("Exporting schematic PDF...")
 os.system(f'kicad-cli sch export pdf "{sch_file}" -o "{PCB_OUT}/{PROJECT}_schematic.pdf"')
 
 # ---- BOM ----
-print("Exporting BOM...")
-os.system(f'kicad-cli sch export bom "{sch_file}" -o "{ASM_OUT}/{PROJECT}_BOM.csv"')
+print("Exporting Grouped BOM...")
+os.system(f'kicad-cli sch export bom "{sch_file}" -o "{ASM_OUT}/{PROJECT}_BOM_grouped.csv" --fields Reference,Value,Description,Footprint,Datasheet,Mfr1,MPN1,Mfr2,MPN2 --group-by Value,Footprint')
+
+print("Exporting UngroupedBOM...")
+os.system(f'kicad-cli sch export bom "{sch_file}" -o "{ASM_OUT}/{PROJECT}_BOM_ungrouped.csv" --fields Reference,Value,Description,Footprint,Datasheet,Mfr1,MPN1,Mfr2,MPN2')
 
 # ---- PICK AND PLACE (CPL) ----
 print("Exporting Pick & Place (CPL)...")
