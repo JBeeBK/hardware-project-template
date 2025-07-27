@@ -1,0 +1,79 @@
+# Ignore KiCad backups and autosaves inside hardware folder
+00_Hardware/*~
+00_Hardware/*.bak
+00_Hardware/*.b#*
+00_Hardware/*.tmp
+00_Hardware/*.swp
+00_Hardware/*.swo
+00_Hardware/*__bak/
+00_Hardware/*backups/
+00_Hardware/USB_PD_JB-backups/
+00_Hardware/*.dcm
+00_Hardware/*.tmp
+00_Hardware/*.cache
+00_Hardware/*.kicad_prl
+00_Hardware/*.kicad_sch-bak
+00_Hardware/*.kicad_pcb-bak
+
+# Ignore simulation/netlist/gerber/fab output in hardware folder
+00_Hardware/*.net
+00_Hardware/*.xml
+00_Hardware/*.xsl
+00_Hardware/*.gbr
+00_Hardware/*.gtp
+00_Hardware/*.gts
+00_Hardware/*.gto
+00_Hardware/*.gbl
+00_Hardware/*.gbo
+00_Hardware/*.gbs
+00_Hardware/*.drl
+00_Hardware/*.zip
+
+# Ignore logs in hardware folder
+00_Hardware/*.log
+
+# Ignore user/project config in hardware folder
+00_Hardware/*.pro.user
+00_Hardware/*.pro.kicad_*
+=======
+# For PCBs designed using KiCad: https://www.kicad.org/
+# Format documentation: https://kicad.org/help/file-formats/
+
+# Temporary files
+*.000
+*.bak
+*.bck
+*.kicad_pcb-bak
+*.kicad_sch-bak
+*-backups
+*-cache*
+*-bak
+*-bak*
+*~
+~*
+_autosave-*
+\#auto_saved_files\#
+*.tmp
+*-save.pro
+*-save.kicad_pcb
+fp-info-cache
+~*.lck
+\#auto_saved_files#
+
+# Netlist files (exported from Eeschema)
+*.net
+
+# Autorouter files (exported from Pcbnew)
+*.dsn
+*.ses
+
+# Exported BOM files
+*.xml
+*.csv
+
+# Archived Backups (KiCad 6.0)
+**/*-backups/*.zip
+
+# Local project settings
+*.kicad_prl
+
