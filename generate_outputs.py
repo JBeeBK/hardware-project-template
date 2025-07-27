@@ -4,7 +4,6 @@ import glob
 HW_DIR = "00_Hardware"
 PCB_OUT = "03_Output_PCB"
 ASM_OUT = "04_Output_Assembly"
-DOCS_OUT = "01_Docs"
 
 # --- Auto-detect project files ---
 pcb_files = glob.glob(f"{HW_DIR}/*.kicad_pcb")
@@ -24,7 +23,7 @@ if not (os.path.isfile(pcb_file) and os.path.isfile(sch_file)):
     exit(1)
 
 # ---- CHECK OUTPUT FOLDERS EXIST ----
-for folder in [PCB_OUT, ASM_OUT, DOCS_OUT]:
+for folder in [PCB_OUT, ASM_OUT]:
     if not os.path.isdir(folder):
         print(f"ERROR: Output folder '{folder}' not found. Please create it.")
         exit(1)
@@ -42,9 +41,13 @@ os.system(f'kicad-cli pcb export drill "{pcb_file}" --output "{PCB_OUT}"')
 print("Exporting PCB PDF...")
 os.system(f'kicad-cli pcb export pdf "{pcb_file}" -o "{PCB_OUT}/{PROJECT}_PCB_layers.pdf" --layers F.Cu,In1.Cu,In2.Cu,B.Cu,F.SilkS,B.SilkS,F.Mask,B.Mask,F.Paste,B.Paste,Edge.Cuts')
 
+# ---- PCB STEP EXPORT ----
+print("Exporting Step File...")
+os.system(f'kicad-cli pcb export step "{pcb_file}" -o "{ASM_OUT}/{PROJECT}_3D.step"')
+
 # ---- SCHEMATIC PDF ----
 print("Exporting schematic PDF...")
-os.system(f'kicad-cli sch export pdf "{sch_file}" -o "{DOCS_OUT}/{PROJECT}_schematic.pdf"')
+os.system(f'kicad-cli sch export pdf "{sch_file}" -o "{PCB_OUT}/{PROJECT}_schematic.pdf"')
 
 # ---- BOM ----
 print("Exporting BOM...")
