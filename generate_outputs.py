@@ -1,22 +1,60 @@
 import os
+import glob
 
-project = "Project_Name"
-hw_dir = "00 - Hardware"
-pcb_file = f"{hw_dir}/{project}.kicad_pcb"
-sch_file = f"{hw_dir}/{project}.kicad_sch"
-pcb_out = "03 - Output_PCB"
-asm_out = "04 - Output_Assembly"
-docs_out = "01 - Docs"
+HW_DIR = "00_Hardware"
+PCB_OUT = "03_Output_PCB"
+ASM_OUT = "04_Output_Assembly"
+DOCS_OUT = "01_Docs"
 
-os.makedirs(pcb_out, exist_ok=True)
-os.makedirs(asm_out, exist_ok=True)
-os.makedirs(docs_out, exist_ok=True)
+# --- Auto-detect project files ---
+pcb_files = glob.glob(f"{HW_DIR}/*.kicad_pcb")
+sch_files = glob.glob(f"{HW_DIR}/*.kicad_sch")
 
-os.system(f'kicad-cli pcb export gerbers "{pcb_file}" --output "{pcb_out}"')
-os.system(f'kicad-cli pcb export drills "{pcb_file}" --output "{pcb_out}"')
-os.system(f'kicad-cli pcb export pdf "{pcb_file}" -o "{pcb_out}/{project}_PCB_layers.pdf"')
-os.system(f'kicad-cli sch export pdf "{sch_file}" -o "{docs_out}/{project}_schematic.pdf"')
-os.system(f'kicad-cli sch export bom "{sch_file}" -o "{asm_out}/{project}_BOM.csv"')
-os.system(f'kicad-cli pcb export pos "{pcb_file}" -o "{asm_out}/{project}_CPL.csv"')
+if not pcb_files or not sch_files:
+    print(f"ERROR: Could not find .kicad_pcb or .kicad_sch in {HW_DIR}")
+    exit(1)
 
-print("All outputs generated and sorted!")
+pcb_file = pcb_files[0]
+sch_file = sch_files[0]
+PROJECT = os.path.splitext(os.path.basename(pcb_file))[0]
+
+# ---- CHECK FILES EXIST ----
+if not (os.path.isfile(pcb_file) and os.path.isfile(sch_file)):
+    print(f"ERROR: Could not find {pcb_file} or {sch_file}")
+    exit(1)
+
+# ---- CHECK OUTPUT FOLDERS EXIST ----
+for folder in [PCB_OUT, ASM_OUT, DOCS_OUT]:
+    if not os.path.isdir(folder):
+        print(f"ERROR: Output folder '{folder}' not found. Please create it.")
+        exit(1)
+
+# ---- GENERATE GERBERS (modern extensions) ----
+#-------Assumes all of my PCBs are 4 layers ------
+print("Exporting Gerbers...")
+os.system(f'kicad-cli pcb export gerbers "{pcb_file}" --output "{PCB_OUT}" --no-protel-ext --layers F.Cu,In1.Cu,In2.Cu,B.Cu,F.SilkS,B.SilkS,F.Mask,B.Mask,F.Paste,B.Paste,Edge.Cuts')
+
+# ---- GENERATE DRILL FILES ----
+print("Exporting Drill files...")
+os.system(f'kicad-cli pcb export drill "{pcb_file}" --output "{PCB_OUT}"')
+
+# ---- PCB LAYERS PDF ----
+print("Exporting PCB PDF...")
+os.system(f'kicad-cli pcb export pdf "{pcb_file}" -o "{PCB_OUT}/{PROJECT}_PCB_layers.pdf" --layers F.Cu,In1.Cu,In2.Cu,B.Cu,F.SilkS,B.SilkS,F.Mask,B.Mask,F.Paste,B.Paste,Edge.Cuts')
+
+# ---- SCHEMATIC PDF ----
+print("Exporting schematic PDF...")
+os.system(f'kicad-cli sch export pdf "{sch_file}" -o "{DOCS_OUT}/{PROJECT}_schematic.pdf"')
+
+# ---- BOM ----
+print("Exporting BOM...")
+os.system(f'kicad-cli sch export bom "{sch_file}" -o "{ASM_OUT}/{PROJECT}_BOM.csv"')
+
+# ---- PICK AND PLACE (CPL) ----
+print("Exporting Pick & Place (CPL)...")
+os.system(f'kicad-cli pcb export pos "{pcb_file}" -o "{ASM_OUT}/{PROJECT}_CPL.csv"')
+
+print("\nAll outputs generated and sorted!")
+
+# ---- OPTIONAL: OPEN OUTPUT FOLDER (uncomment for Windows) ----
+# os.system(f'start "" "{os.path.abspath(PCB_OUT)}"')
